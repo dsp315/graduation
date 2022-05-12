@@ -14,5 +14,4 @@ public class Pay {
     @Id
     private Integer pId;
     private String pName;
-    private Float pCost;
 }
