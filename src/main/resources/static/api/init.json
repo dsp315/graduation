@@ -1,0 +1,126 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "/welcome"
+  },
+  "logoInfo": {
+    "title": "便民物业",
+    "image": "/images/logo.jpg",
+    "href": ""
+  },
+  "menuInfo": [
+    {
+      "title": "常规管理",
+      "icon": "fa fa-address-book",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "首页",
+          "href": "/welcome",
+          "icon": "fa fa-home",
+          "target": "_self"
+        },
+        {
+          "title": "房屋系统",
+          "icon": "fa fa-building",
+          "target": "_self",
+          "child": [
+            {
+              "title": "楼栋管理",
+              "href": "/building",
+              "icon": "fa fa-building",
+              "target": "_self"
+            },
+            {
+              "title": "单元管理",
+              "href": "/unit",
+              "icon": "fa fa-building-o",
+              "target": "_self"
+            },
+            {
+              "title": "房屋管理",
+              "href": "/room",
+              "icon": "fa fa-home",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "车位系统",
+          "icon": "fa fa-car",
+          "target": "_self",
+          "child": [{
+            "title": "车位管理",
+            "href": "/car",
+            "icon": "fa fa-car",
+            "target": "_self"
+          }]
+        },
+        {
+          "title": "缴费系统",
+          "icon": "layui-icon layui-icon-username",
+          "target": "_self",
+          "child": [
+            {
+              "title": "缴费类型",
+              "href": "/pay",
+              "icon": "fa fa-credit-card",
+              "target": "_self"
+            },
+            {
+              "title": "缴费管理",
+              "href": "/welcome",
+              "icon": "fa fa-paypal",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "社区服务",
+          "icon": "layui-icon layui-icon-component",
+          "target": "_self",
+          "child": [
+            {
+              "title": "公告管理",
+              "href": "/notice",
+              "icon": "fa fa-bars",
+              "target": "_self"
+            },
+            {
+              "title": "维修管理",
+              "href": "/maintain",
+              "icon": "layui-icon layui-icon-util",
+              "target": "_self"
+            },
+            {
+              "title": "留言管理",
+              "href": "/guestbook",
+              "icon": "fa fa-file",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "用户系统",
+          "icon": "layui-icon layui-icon-set-fill",
+          "target": "_self",
+          "child": [
+            {
+              "title": "用户管理",
+              "href": "/users",
+              "icon": "fa fa-user",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "个人中心",
+          "href": "/admin/info",
+          "icon": "fa fa-gears",
+          "target": "_self"
+        }
+      ]
+    }
+  ]
+}

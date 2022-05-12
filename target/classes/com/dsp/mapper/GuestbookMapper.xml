@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dsp.mapper.GuestbookMapper">
+
+    <resultMap id="guestbookMap" type="com.dsp.domain.Guestbook">
+        <id column="g_id" property="gId"/>
+        <result column="g_title" property="gTitle"/>
+        <result column="g_content" property="gContent"/>
+        <result column="g_release_time" property="gReleaseTime"/>
+        <result column="user_id" property="userId"/>
+        <association property="user" javaType="com.dsp.domain.User">
+            <id column="u_id" property="uId"/>
+            <result column="u_name" property="uName"/>
+            <result column="username" property="username"/>
+            <result column="guestbook_id" property="GuestbookId"/>
+        </association>
+    </resultMap>
+
+    <select id="selectGuestbookList" resultMap="guestbookMap">
+        select *
+        from guestbook
+    </select>
+
+    <select id="selectGuestbookListAndLike" parameterType="com.dsp.domain.Guestbook" resultMap="guestbookMap">
+        select * from guestbook
+        <where>
+            <if test="startDate != null">
+                <![CDATA[
+                and g_release_time >= #{startDate}
+                ]]>
+            </if>
+            <if test="endDate != null">
+                <![CDATA[
+                and g_release_time <= #{endDate}
+                ]]>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectById" resultMap="guestbookMap">
+        select * from guestbook
+        <where>
+            <if test="id != null">
+                g_id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteById" >
+        DELETE FROM guestbook
+        <where>
+            AND g_id = #{id}
+        </where>
+    </delete>
+
+</mapper>

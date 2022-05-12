@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="icon" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/layuimini.css?v=2.0.4.2}" media="all">
+    <link rel="stylesheet" th:href="@{/css/themes/default.css}" media="all">
+    <link rel="stylesheet" th:href="@{/lib/font-awesome-4.7.0/css/font-awesome.min.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/admin/globalList.css}">
+</head>
+
+<body>
+    <div class="div-content">
+        <form class="layui-form layui-form-pane" id="form-search">
+            <fieldset class="fieldset-style">
+                <legend>搜索条件</legend>
+                <div class="layui-form-item">
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">楼栋</label>
+                        <div class="layui-input-inline" style="width: 120px;">
+                            <input type="text" name="name" placeholder="请输入楼栋名" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button id="btn-search" lay-submit lay-filter="btn-search-filter" type="button" class="layui-btn layui-btn-radius layui-btn-normal">
+                            搜索
+                        </button>
+                        <button id="btn-reset" type="reset" class="layui-btn layui-btn-radius layui-btn-primary">
+                            清空
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <!--表格-->
+        <table id="table-build" lay-filter="table-build-filter"></table>
+    </div>
+
+
+    <script th:src="@{/js/jquery.min.js}" charset="utf-8"></script>
+    <script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+
+    <!--类型template模板-->
+    <script type="text/html" id="table-build-type">
+        {{#  if(d.btype == 1){ }}
+            豪宅
+        {{#  } else if(d.btype == 2){ }}
+            电梯房
+        {{#  } else if(d.btype == 3){}}
+            普通房
+        {{#  } }}
+    </script>
+
+    <!--工具栏模板-->：
+    <script type="text/html" id="table-build-toolbar">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+            <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</button>
+        </div>
+    </script>
+
+    <!--表格操作工具栏-->
+    <script type="text/html" id="col-build-toolbar">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+    <script th:inline="javascript">
+
+        var ctxPath = [[@{/}]];
+
+        //刷新数据表格
+        function refreshTable() {
+            $('#btn-reset').click();
+            $('#btn-search').click();
+        }
+
+        layui.use(['laydate','table','form'], function(){
+            var laydate = layui.laydate;
+            var table = layui.table;
+            var form = layui.form;
+
+
+            //表单监听
+            form.on('submit(btn-search-filter)', function(data){
+                console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+                //刷新表格
+                table.reload('table-build', {
+                    where: { //设定异步数据接口的额外参数，任意设
+                        bName:data.field.name,
+                    }
+                    ,page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            });
+
+            //表格渲染
+            table.render({
+                elem: '#table-build'
+                ,url: ctxPath + 'building/list' //数据接口
+                ,toolbar: '#table-build-toolbar'//头部工具栏
+                ,limit: 9
+                ,limits: [10,5,20,50,100]  //每页条数的选择项
+                ,page: true //开启分页
+                //分页方法一：
+                ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
+                    var result;
+                    if(this.page.curr){
+                        //若为第二页 则curr为2 页面显示的数据就是从res.data集合数组里的 （2-1）*limit（10）=10 到 limit（10）*2=20的数据
+                        result = res.data.slice(this.limit*(this.page.curr-1),this.limit*this.page.curr);
+                    }
+                    else{
+                        // 一开始就是第一页 则就是 显示的数据就是从res.data集合数组里的0到limit（10）中
+                        result=res.data.slice(0,this.limit);
+                    }
+                    return {
+                        "code": res.code, //解析接口状态
+                        "msg": res.msg, //解析提示文本
+                        "count": res.count, //解析数据长度
+                        "data": result //解析数据列表
+                    };
+                }
+                ,cols: [[ //表头
+                    {type: 'checkbox'}
+                    ,{field: 'bid', title: 'id', width:100, sort: true,align:'center'}
+                    ,{field: 'bname', title: '楼栋名', align:'center'}
+                    ,{field: 'btype', title: '类型', align:'center', templet: '#table-build-type'}
+                    ,{title: '操作', width: 200, toolbar: '#col-build-toolbar'}
+                ]]
+            });
+
+            //表格操作列的监听
+            table.on('tool(table-build-filter)', function(obj){
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+
+                if(layEvent === 'del'){ //删除
+                    layer.confirm('您确认删除'+data.bname +' ?', {icon: 3, title:'删除确认'}, function(index){
+                        //异步发送请求
+                        var url = ctxPath + "building/" + data.bid;
+                        var param = {_method:"DELETE"}
+                        $.post(url,param,function (response) {
+                            if (response.code == 0){
+                                //成功，提示和刷新表格
+                                layer.msg("你已删除"+data.name,{icon: 6,title: "操作结果"});
+                                refreshTable();
+                            }else{
+                                layer.alert(response.msg,{icon: 2,anim: 6})
+                            }
+                        })
+                        layer.close(index);
+                    });
+                }else if(layEvent === 'edit') { //编辑
+                    layer.open({
+                        type: 2,
+                        title: '修改楼栋',
+                        shadeClose: false,
+                        area: ['50%', '95%'],
+                        content: ctxPath + 'building/' + data.bid
+                    });
+                }
+            });
+
+            //表格头部工具栏的监听
+            table.on('toolbar(table-build-filter)', function(obj){
+                if (obj.event == 'add'){
+                    layer.open({
+                        type: 2,
+                        title: '添加楼栋',
+                        shadeClose: false,
+                        area: ['30%', '55%'],
+                        content: ctxPath + 'building/add/ui'
+                    });
+                }else if (obj.event == 'delete'){
+                    var checkStatus = table.checkStatus('table-build'); //idTest 即为基础参数 id 对应的值
+                    console.log(checkStatus.data) //获取选中行的数据
+                    console.log(checkStatus.data.length)
+                    //如果没选中
+                    if (checkStatus.data.length == 0){
+                        layer.alert('请选择删除的楼栋', {icon: 2, anim: 6, title: "警告"});
+                    }else{
+
+                        //选中的id
+                        var idArr = new Array();
+                        $(checkStatus.data).each(function () {
+                            idArr.push(this.bid);
+                        });
+
+                        layer.confirm('您确认删除选中记录？', {icon: 3, title:'删除确认'}, function(index){
+                            //异步发送请求
+                            var url = ctxPath + "building/" + idArr.join(",");
+                            var param = {_method:"DELETE"}
+                            $.post(url,param,function (response) {
+                                if (response.code == 0){
+                                    //成功，提示和刷新表格
+                                    layer.msg(response.msg,{icon: 6,title: "操作结果"});
+                                    refreshTable();
+                                }else{
+                                    layer.alert(response.msg,{icon: 2,anim: 6})
+                                }
+                            })
+                            layer.close(index);
+                        });
+                    }
+
+                }
+
+            });
+
+        })
+    </script>
+</body>
+</html>

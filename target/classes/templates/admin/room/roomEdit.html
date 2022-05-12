@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="icon" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/layuimini.css?v=2.0.4.2}" media="all">
+    <link rel="stylesheet" th:href="@{/css/themes/default.css}" media="all">
+    <link rel="stylesheet" th:href="@{/lib/font-awesome-4.7.0/css/font-awesome.min.css}" media="all">
+</head>
+<body>
+<form class="layui-form"  th:object="${room}">
+    <input type="hidden" th:field="*{RId}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">房间名</label>
+        <div class="layui-input-block">
+            <input type="text" style="text-align: left" th:field="*{RName}" required  lay-verify="required" placeholder="请输入单元名名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">房间面积</label>
+        <div class="layui-input-block">
+            <input type="number" style="text-align: left" th:field="*{RArea}" required  lay-verify="required" placeholder="请输入单元名名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">房间状态</label>
+        <div class="layui-input-block">
+            <input type="radio" th:field="*{RState}" value="0" title="无主" checked>
+            <input type="radio" th:field="*{RState}" value="1" title="有主">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属单元</label>
+        <div class="layui-input-block">
+            <select th:field="*{unitId}" lay-filter="unitName" lay-verify="required">
+                <option value="">请选择</option>
+                <option th:each="unit:${units}" th:value="${unit.TId}">
+                    <span th:text="${unit.TName}"></span>
+                </option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">楼栋类型</label>
+        <div class="layui-input-block">
+            <input type="text" id="buildType" disabled placeholder="请先选择所属单元" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="btn-submit-filter">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    var ctxPath = [[@{/}]];
+    layui.use(['laydate','table','form'], function(){
+        var form = layui.form;
+        var $ = layui.$;
+
+        //当单元选定，查询该单元和楼栋类型
+        form.on('select(unitName)', function(data){
+            const url = ctxPath + "room/selectBuildType";
+            $.get(url,{'uid':data.value},function (res) {
+                if (res == 1){
+                    $('#buildType').val('豪宅')
+                }else if (res == 2){
+                    $('#buildType').val('电梯房')
+                }else {
+                    $('#buildType').val('普通房')
+                }
+            })
+        });
+
+        form.on('submit(btn-submit-filter)', function(data){
+            //异步提交数据
+            var url = ctxPath + "room";
+            data.field._method = "PUT";
+            $.post(url,data.field,function (response) {
+                if (response.code == 0){
+                    //成功则关闭页面，并刷新数据
+                    layer.msg(response.msg, {
+                        icon: 1,
+                        time: 1500 //2秒关闭（如果不配置，默认是3秒）
+                    }, function(){
+                        //刷新数据
+                        parent.refreshTable();
+                        //关闭页面
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index); //再执行关闭
+                    });
+                }else{
+                    //失败，不关闭页面，提示错误信息
+                    layer.msg(response.msg, {
+                        icon: 2,
+                        anim: 6
+                    });
+                }
+            })
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+
+    });
+
+</script>
+</body>
+</html>

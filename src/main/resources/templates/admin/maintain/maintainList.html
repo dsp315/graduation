@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="icon" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/layuimini.css?v=2.0.4.2}" media="all">
+    <link rel="stylesheet" th:href="@{/css/themes/default.css}" media="all">
+    <link rel="stylesheet" th:href="@{/lib/font-awesome-4.7.0/css/font-awesome.min.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/admin/globalList.css}">
+</head>
+
+<body>
+<div class="div-content">
+    <form class="layui-form layui-form-pane" id="form-search">
+        <fieldset class="fieldset-style">
+            <legend>搜索条件</legend>
+            <div class="layui-form-item">
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">日期范围</label>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" autocomplete="off" name="startDate" class="layui-input" th:id="startDate" placeholder="开始日期" >
+                        </div>
+                        <div class="layui-form-mid">-</div>
+                        <div class="layui-input-inline">
+                            <input type="text" autocomplete="off" name="endDate" class="layui-input"th:id="endDate" placeholder="结束日期">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button id="btn-search" lay-submit lay-filter="btn-search-filter" type="button"
+                            class="layui-btn layui-btn-radius layui-btn-normal">
+                        搜索
+                    </button>
+                    <button id="btn-reset" type="reset" class="layui-btn layui-btn-radius layui-btn-primary">
+                        清空
+                    </button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <!--表格-->
+    <table id="table-maintain" lay-filter="table-maintain-filter"></table>
+</div>
+
+
+<script th:src="@{/js/jquery.min.js}" charset="utf-8"></script>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+
+<!--有主工具栏-->
+<script type="text/html" id="table-col-state">
+    <!-- 这里的 checked 的状态只是演示 -->
+    <input type="checkbox" disabled name="mstate" value="{{d.mstate}}" lay-skin="switch" lay-text="已受理|未受理"
+           lay-filter="state-filter" {{ d.mstate == 1 ? 'checked' : '' }}>
+</script>
+<script type="text/html" id="table-cool-user">
+    {{#  if(d.user.uname != null) { }}
+        <p>{{d.user.uname}}</P>
+    {{#  } else{ }}
+
+    {{#  } }}
+</script>
+
+<!--工具栏模板-->：
+<script type="text/html" id="table-maintain-toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</button>
+    </div>
+</script>
+
+<!--表格操作工具栏-->
+<script type="text/html" id="col-maintain-toolbar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">受理</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script th:inline="javascript">
+
+    var ctxPath = [[@{/}]];
+
+        //刷新数据表格
+        function refreshTable() {
+            $('#btn-reset').click();
+            $('#btn-search').click();
+        }
+
+        layui.use(['laydate', 'table', 'form'], function () {
+            var laydate = layui.laydate;
+            var table = layui.table;
+            var form = layui.form;
+
+            //日期监听
+            laydate.render({
+                elem: '#startDate'
+            })
+            laydate.render({
+                elem: '#endDate'
+            })
+
+
+            //表单监听
+            form.on('submit(btn-search-filter)', function (data) {
+                console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+                //刷新表格
+                    table.reload('table-maintain', {
+                        where: { //设定异步数据接口的额外参数，任意设
+                            name:data.field.name,
+                            startDate: data.field.startDate,
+                            endDate: data.field.endDate,
+                        }
+                        , page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                    })
+                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            });
+
+            //表格渲染
+            table.render({
+                elem: '#table-maintain'
+                , url: ctxPath + 'maintain/list' //数据接口
+                , toolbar: '#table-maintain-toolbar'//头部工具栏
+                , limit: 9
+                , limits: [10, 5, 20, 50, 100]  //每页条数的选择项
+                , page: true //开启分页
+                //分页方法一：
+                , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
+                    var result;
+                    if (this.page.curr) {
+                        //若为第二页 则curr为2 页面显示的数据就是从res.data集合数组里的 （2-1）*limit（10）=10 到 limit（10）*2=20的数据
+                        result = res.data.slice(this.limit * (this.page.curr - 1), this.limit * this.page.curr);
+                    } else {
+                        // 一开始就是第一页 则就是 显示的数据就是从res.data集合数组里的0到limit（10）中
+                        result = res.data.slice(0, this.limit);
+                    }
+                    return {
+                        "code": res.code, //解析接口状态
+                        "msg": res.msg, //解析提示文本
+                        "count": res.count, //解析数据长度
+                        "data": result //解析数据列表
+                    };
+                }
+                , cols: [[ //表头
+                    {type: 'checkbox'}
+                    , {field: 'mid', title: 'id', width: 100, sort: true, align: 'center'}
+                    , {field: 'mcontent', title: '维修内容', align: 'center'}
+                    , {field: 'user', title: '发布者', align: 'center',templet: '#table-cool-user'}
+                    , {field: 'mreleaseTime', title: '发布时间', align: 'center'}
+                    , {field: 'mresult', title: '受理结果', align: 'center'}
+                    , {field: 'mstate', title: '受理状态', align: 'center',templet: "#table-col-state"}
+                    , {title: '操作', width: 200, toolbar: '#col-maintain-toolbar'}
+                ]]
+            });
+
+            //表格操作列的监听
+            table.on('tool(table-maintain-filter)', function (obj) {
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                if (layEvent === 'del') { //删除
+                    layer.confirm('您确认删除该数据吗?', {icon: 3, title: '删除确认'}, function (index) {
+                        //异步发送请求
+                        var url = ctxPath + "maintain/" + data.mid;
+                        var param = {_method: "DELETE"}
+                        console.log(url)
+                        $.post(url, param, function (response) {
+                            if (response.code == 0) {
+                                //成功，提示和刷新表格
+                                layer.msg("你已删除该数据", {icon: 6, title: "操作结果"});
+                                refreshTable();
+                            } else {
+                                layer.alert(response.msg, {icon: 2, anim: 6})
+                            }
+                        })
+                        layer.close(index);
+                    });
+                } else if (layEvent === 'edit') { //编辑
+                    layer.open({
+                        type: 2,
+                        title: '受理维修',
+                        shadeClose: false,
+                        area: ['50%', '95%'],
+                        content: ctxPath + 'maintain/' + data.mid
+                    });
+                }
+            });
+            //表格头部工具栏的监听
+            table.on('toolbar(table-maintain-filter)', function (obj) {
+                if (obj.event == 'delete') {
+                    var checkStatus = table.checkStatus('table-maintain'); //idTest 即为基础参数 id 对应的值
+                    console.log(checkStatus.data) //获取选中行的数据
+                    console.log(checkStatus.data.length)
+                    //如果没选中
+                    if (checkStatus.data.length == 0) {
+                        layer.alert('请选择删除的维修内容', {icon: 2, anim: 6, title: "警告"});
+                    } else {
+                        //选中的id
+                        var idArr = new Array();
+                        $(checkStatus.data).each(function () {
+                            idArr.push(this.mid);
+                        });
+
+                        layer.confirm('您确认删除选中记录？', {icon: 3, title: '删除确认'}, function (index) {
+                            //异步发送请求
+                            var url = ctxPath + "maintain/" + idArr.join(",");
+                            var param = {_method: "DELETE"}
+                            $.post(url, param, function (response) {
+                                if (response.code == 0) {
+                                    //成功，提示和刷新表格
+                                    layer.msg(response.msg, {icon: 6, title: "操作结果"});
+                                    refreshTable();
+                                } else {
+                                    layer.alert(response.msg, {icon: 2, anim: 6})
+                                }
+                            })
+                            layer.close(index);
+                        });
+                    }
+
+                }
+
+            });
+
+        })
+</script>
+</body>
+</html>

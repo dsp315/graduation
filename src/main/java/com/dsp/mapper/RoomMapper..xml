@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- dao映射源文件（com.dsp.dao.StudentDao） -->
+<mapper namespace="com.dsp.mapper.RoomMapper">
+
+    <resultMap id="roomMap" type="com.dsp.domain.Room">
+        <id column="r_id" property="rId"/>
+        <result column="r_name" property="rName"/>
+        <result column="r_area" property="rArea"/>
+        <result column="r_state" property="rState"/>
+        <result column="unit_id" property="UnitId"/>
+        <association property="unit" javaType="com.dsp.domain.Unit">
+            <id column="t_id" property="tId"/>
+            <result column="t_name" property="tName"/>
+            <result column="building_id" property="BuildingId"/>
+        </association>
+    </resultMap>
+
+    <!--查询所有-->
+    <select id="selectListRoom" resultMap="roomMap">
+        SELECT *
+        FROM room r, unit t
+        where r.unit_id = t.t_id
+    </select>
+
+    <!--id查询-->
+    <select id="selectRoomById" parameterType="int" resultMap="roomMap" >
+        SELECT r.r_id, r.r_name, r.r_area, r.r_state, t.t_name
+        FROM room r, unit t
+        where r.unit_id = t.t_id AND r.r_id = #{id}
+    </select>
+
+    <!--模糊查询-->
+    <select id="selectRoomByNameAndLike" parameterType="com.dsp.domain.Room" resultMap="roomMap">
+        SELECT r.r_id, r.r_name, r.r_area, r.r_state, t.t_name
+        FROM room r, unit t
+        <where>
+            <if test="rName != null">
+                and r.r_name like concat('%',#{rName},'%')
+            </if>
+            <if test="startNum != null">
+                and r.r_area >= #{startNum}
+            </if>
+            <if test="endNum != null">
+                <![CDATA[and r.r_area <= #{endNum}]]>
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertRoom">
+
+    </insert>
+
+</mapper>

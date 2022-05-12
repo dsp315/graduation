@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- dao映射源文件（com.dsp.dao.StudentDao） -->
+<mapper namespace="com.dsp.mapper.AdminMapper">
+
+    <update id="updateAdminInfo" parameterType="com.dsp.domain.Admin">
+        UPDATE admin SET a_name = #{aName},a_phone = #{aPhone} WHERE a_id=#{aId}
+    </update>
+
+    <update id="editImg" >
+        UPDATE admin SET a_img = #{filePath} WHERE a_id=#{aId}
+    </update>
+
+</mapper>
