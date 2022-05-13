@@ -1,11 +1,9 @@
 package com.dsp.controller;
 
 import com.dsp.domain.Admin;
-import com.dsp.excetion.MyEnum;
 import com.dsp.excetion.MyException;
 import com.dsp.service.AdminService;
 import com.dsp.vo.ResultVO;
-import com.wf.captcha.utils.CaptchaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,9 +40,14 @@ public class AdminController {
             resultVO.setMsg(e.getMessage());
         }
         return resultVO;
-
-
     }
+
+    @GetMapping("/loginOut")
+    @ResponseBody
+    public void loginOut(HttpSession session){
+        session.removeAttribute("info");
+    }
+
     @GetMapping("/index")
     public String toIndex(Admin admin){
         return "admin/index";
@@ -83,7 +86,6 @@ public class AdminController {
         return resultVO;
     }
     /*修改照片*/
-
     /**
      * MultipartFile:表单提交获取文件
      */
@@ -110,6 +112,48 @@ public class AdminController {
                 session.setAttribute("info",admin);
             }
         }catch (Exception e ){
+            resultVO.setMsg(e.getMessage());
+        }
+        return resultVO;
+    }
+    /**
+     * 修改密码
+     */
+    /*页面*/
+    @GetMapping("/editPasswordUI")
+    public String toEditPasswordUI(){
+        return "admin/adminInfo/editPassword";
+    }
+    /*校验密码*/
+    @GetMapping("/checkPassword")
+    @ResponseBody
+    public int checkPassword(String password,HttpSession session){
+        int i = 0;
+        Admin admin = (Admin) session.getAttribute("info");
+        Integer id = admin.getAId();
+        boolean checked = adminService.checkPassword(password,id);
+        if (!checked){
+            i = 1;
+            return i;
+        }
+        return i;
+    }
+
+    /*修改密码*/
+    @PostMapping("/editPassword")
+    @ResponseBody
+    public ResultVO editPassword(Admin admin,HttpSession session,HttpServletRequest request){
+        ResultVO resultVO = new ResultVO();
+        try {
+            Admin admin1 = (Admin) session.getAttribute("info");
+            Integer aId = admin1.getAId();
+            admin.setAId(aId);
+            int i = adminService.modifyAdminPassword(admin);
+            if (i>0){
+                resultVO.setCode(0);
+                resultVO.setMsg("修改成功");
+            }
+        }catch (MyException e){
             resultVO.setMsg(e.getMessage());
         }
         return resultVO;

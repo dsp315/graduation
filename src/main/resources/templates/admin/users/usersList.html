@@ -134,8 +134,12 @@
                     , {field: 'uname', title: '真实姓名', align: 'center'}
                     , {field: 'uphone', title: '手机号', align: 'center'}
                     , {field: 'usex', title: '性别', align: 'center' ,templet:'#table-col-usex'}
-                    , {field: 'uSex', title: '车位', align: 'center'}
-                    , {field: 'uSex', title: '地址', align: 'center'}
+                    , {field: 'car', title: '车位',templet:function (d){
+                        if (d.car!= null){return d.car.cname;}else{return '暂无'}
+                        }, align: 'center'}
+                    , {field: 'room', title: '地址',templet:function (d){
+                            if (d.room!= null){return d.room.unit.tname+'单元'+d.room.rname;}else{return '暂无'}
+                       }, align: 'center'}
                     , {title: '操作', width: 200, toolbar: '#col-users-toolbar'}
                 ]]
             });
@@ -146,15 +150,15 @@
                 var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
 
                 if (layEvent === 'del') { //删除
-                    layer.confirm('您确认删除' + data.ntitle + ' ?', {icon: 3, title: '删除确认'}, function (index) {
+                    layer.confirm('您确认删除' + data.uname + ' ?', {icon: 3, title: '删除确认'}, function (index) {
                         //异步发送请求
-                        var url = ctxPath + "users/" + data.nid;
+                        var url = ctxPath + "users/" + data.uid;
                         var param = {_method: "DELETE"}
                         console.log(url)
                         $.post(url, param, function (response) {
                             if (response.code == 0) {
                                 //成功，提示和刷新表格
-                                layer.msg("你已删除" + data.ntitle, {icon: 6, title: "操作结果"});
+                                layer.msg("你已删除" + data.uname, {icon: 6, title: "操作结果"});
                                 refreshTable();
                             } else {
                                 layer.alert(response.msg, {icon: 2, anim: 6})
@@ -165,10 +169,10 @@
                 } else if (layEvent === 'edit') { //编辑
                     layer.open({
                         type: 2,
-                        title: '修改公告',
+                        title: '修改用户',
                         shadeClose: false,
                         area: ['50%', '95%'],
-                        content: ctxPath + 'users/' + data.nid
+                        content: ctxPath + 'users/' + data.uid
                     });
                 }
             });
@@ -177,7 +181,7 @@
                 if (obj.event == 'add') {
                     layer.open({
                         type: 2,
-                        title: '添加公告',
+                        title: '添加用户',
                         shadeClose: false,
                         area: ['40%', '80%'],
                         content: ctxPath + 'users/add/ui'
@@ -188,13 +192,12 @@
                     console.log(checkStatus.data.length)
                     //如果没选中
                     if (checkStatus.data.length == 0) {
-                        layer.alert('请选择删除的公告', {icon: 2, anim: 6, title: "警告"});
+                        layer.alert('请选择删除的用户', {icon: 2, anim: 6, title: "警告"});
                     } else {
-
                         //选中的id
                         var idArr = new Array();
                         $(checkStatus.data).each(function () {
-                            idArr.push(this.nid);
+                            idArr.push(this.uid);
                         });
 
                         layer.confirm('您确认删除选中记录？', {icon: 3, title: '删除确认'}, function (index) {

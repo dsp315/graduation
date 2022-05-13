@@ -19,8 +19,9 @@ public class CommonController {
     /*管理跳转*/
     @RequestMapping("/welcome")
     public String toWelcome(){
-        return "admin/welcome";
+        return "admin/home/welcome";
     }
+
 
     /*图形校验码*/
     @RequestMapping("/captcha")

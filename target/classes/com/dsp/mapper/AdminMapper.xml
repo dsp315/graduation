@@ -13,4 +13,8 @@
         UPDATE admin SET a_img = #{filePath} WHERE a_id=#{aId}
     </update>
 
+    <update id="updatePassword">
+        UPDATE admin SET a_password = #{password} WHERE a_id=#{aId}
+    </update>
+
 </mapper>

@@ -22,6 +22,9 @@ public class User {
     private Float uPay;
     private String uImg;
 
+    private Integer roomId;
+    private Integer carId;
+    private Integer pay_id;
 
     private Room room;
     private Car car;

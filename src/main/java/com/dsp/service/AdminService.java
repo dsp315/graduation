@@ -14,4 +14,8 @@ public interface AdminService {
     int modifyAdminInfo(Admin admin);
 
     Map<String,String> editImg(MultipartFile fileUpload, String paramName, HttpServletRequest request);
+
+    int modifyAdminPassword(Admin admin);
+
+    boolean checkPassword(String password, Integer id);
 }

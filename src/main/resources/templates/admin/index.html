@@ -66,7 +66,7 @@
                             <a href="javascript:;" layuimini-content-href="/admin/info" data-title="基本资料" data-icon="fa fa-gears">基本资料<span class="layui-badge-dot"></span></a>
                         </dd>
                         <dd>
-                            <a href="javascript:;" layuimini-content-href="page/user-password.html" data-title="修改密码" data-icon="fa fa-gears">修改密码</a>
+                            <a href="javascript:;" th:id="editPassword" data-title="修改密码" data-icon="fa fa-gears">修改密码</a>
                         </dd>
                         <dd>
                             <hr>
@@ -159,10 +159,24 @@
                 ],
             });
             $('.login-out').on("click", function () {
-                layer.msg('退出登录成功', function () {
-                    window.location = 'page/login-3.html';
+
+                layer.confirm('退出登录吗?', {icon: 2, title:'提示'}, function(index){
+                    $.get(ctxPath+'admin/loginOut',function (){
+                        layer.close(index);
+                        window.location.href=ctxPath + 'login'
+                    })
                 });
             });
+            $("#editPassword").click(function (){
+                layer.open({
+                    type: 2,
+                    title: '修改密码',
+                    shadeClose: false,
+                    area: ['40%', '50%'],
+                    content: ctxPath + 'admin/editPasswordUI'
+                });
+            });
+
         });
 </script>
 </body>

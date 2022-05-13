@@ -5,6 +5,7 @@ public enum MyEnum {
     ADMIN_LOGIN_NOT_ACCOUNT("001-002","管理员登录失败"),
     ADMIN_MODIFY_INFO_FAIL("001-003","服务器出错了，修改信息失败，请联系开发人员"),
     ADMIN_MODIFY_IMG_FAIL("001-004","服务器出错了，修改头像失败，请联系开发人员"),
+    ADMIN_MODIFY_PASSWORD_FAIL("001-004","服务器出错了，修改密码失败，请联系开发人员"),
 
     BUILDING_NOT_EXIST("002-001","建筑不存在"),
     BUILDING_ADD_FAIL("002-002","服务器繁忙，建筑添加失败，请稍后重试"),
@@ -45,6 +46,9 @@ public enum MyEnum {
     Guestbook_UPDATE_FAIL("008-003","服务器繁忙，留言处理失败，请稍后重试"),
 
     USER_NOT_EXIST("010-001","用户不存在，请输入正确的用户名字"),
+    USER_ADD_FAIL("010-002","服务器繁忙，用户添加失败，请稍后重试"),
+    USER_DELETE_FAIL("006-003","服务器繁忙，用户删除失败，请稍后重试"),
+    USER_UPDATE_FAIL("006-004","服务器繁忙，用户修改失败，请稍后重试"),
     ;
 
     private String code;

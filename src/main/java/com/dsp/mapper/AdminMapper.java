@@ -13,4 +13,6 @@ public interface AdminMapper extends BaseTkMapper<Admin> {
     int updateAdminInfo(Admin admin);
 
     int editImg(@Param("aId") Integer aId, @Param("filePath") String filePath);
+
+    int updatePassword(String password, Integer aId);
 }

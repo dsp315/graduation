@@ -11,5 +11,11 @@ public interface UsersService {
 
     List<User> getUserList();
 
-    List<Building> getUserAndLike(User param);
+    List<User> getUserAndLike(User param);
+
+    int addUser(User user);
+
+    int delUsersById(String ids);
+
+    int editUser(User user);
 }

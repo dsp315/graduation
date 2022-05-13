@@ -107,4 +107,40 @@ public class AdminServiceImpl implements AdminService {
         }
         return map;
     }
+
+    @Override
+    public boolean checkPassword(String password, Integer id) {
+        Admin admin = adminMapper.selectByPrimaryKey(id);
+        String aPassword = admin.getAPassword();
+        //密码加密
+        password = MD5Util.getMD5(password);
+
+        if (!aPassword.equals(password)){
+             return false;
+        }
+        return true;
+
+    }
+
+    @Override
+    public int modifyAdminPassword(Admin admin) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = txManager.getTransaction(def);
+        int i = 0;
+        try {
+            //密码加密
+            String password = admin.getAPassword();
+            password = MD5Util.getMD5(password);
+            i = adminMapper.updatePassword(password,admin.getAId());
+            if (i> 0){
+                txManager.commit(status);
+            }else {
+                throw new MyException(MyEnum.ADMIN_MODIFY_PASSWORD_FAIL);
+            }
+        }catch (MyException e){
+            txManager.rollback(status);
+        }
+        return i;
+    }
 }

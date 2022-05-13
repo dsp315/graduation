@@ -19,7 +19,21 @@
           "title": "首页",
           "href": "/welcome",
           "icon": "fa fa-home",
-          "target": "_self"
+          "target": "_self",
+          "child": [
+            {
+              "title": "报表统计",
+              "href": "/welcome",
+              "icon": "fa fa-building",
+              "target": "_self"
+            },
+            {
+              "title": "数据库",
+              "href": "/druid",
+              "icon": "fa fa-building-o",
+              "target": "_self"
+            }
+          ]
         },
         {
           "title": "房屋系统",
@@ -70,7 +84,7 @@
             },
             {
               "title": "缴费管理",
-              "href": "/welcome",
+              "href": "/userPay",
               "icon": "fa fa-paypal",
               "target": "_self"
             }
