@@ -42,7 +42,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public List<User> getUserList() {
         List<User> users = userMapper.selectAll();
-        for (int i = 0;i<users.size();i++){
+        for (int i = 0; i < users.size(); i++) {
             User user = users.get(i);
             //获取车位信息
             Integer carId = user.getCarId();
@@ -60,10 +60,10 @@ public class UsersServiceImpl implements UsersService {
     public List<User> getUserAndLike(User param) {
         Example example = new Example(User.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.orLike("uName","%"+ param.getUName() + "%");
-        criteria.orLike("uPhone","%" + param.getUPhone() + "%");
+        criteria.orLike("uName", "%" + param.getUName() + "%");
+        criteria.orLike("uPhone", "%" + param.getUPhone() + "%");
         List<User> users = userMapper.selectByExample(example);
-        for (User user: users) {
+        for (User user : users) {
             //获取车位信息
             Integer carId = user.getCarId();
             Car car = carMapper.selectByPrimaryKey(carId);
@@ -83,16 +83,17 @@ public class UsersServiceImpl implements UsersService {
         TransactionStatus status = txManager.getTransaction(def);
         int i = 0;
         try {
-            i =userMapper.insertSelective(user);
-            if (i>0){
+            i = userMapper.insertSelective(user);
+            if (i > 0) {
                 txManager.commit(status);
             }
-        }catch (MyException e){
+        } catch (MyException e) {
             txManager.rollback(status);
             throw new MyException(MyEnum.USER_ADD_FAIL);
         }
         return i;
     }
+
     /*删*/
     @Override
     public int delUsersById(String strIds) {
@@ -125,13 +126,86 @@ public class UsersServiceImpl implements UsersService {
         int i = 0;
         try {
             i = userMapper.updateByPrimaryKeySelective(user);
-            if (i > 0){
+            if (i > 0) {
                 txManager.commit(status);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             txManager.rollback(status);
             throw new MyException(MyEnum.USER_UPDATE_FAIL);
         }
         return i;
     }
+
+    /*停用车位*/
+    @Override
+    public int delCar(Integer id, Integer carId) {
+
+        int i = 0;
+        //获取用户信息，检测是否拥有车位
+        User user = userMapper.selectByPrimaryKey(id);
+        if (user.getCarId() == 0) {
+            throw new MyException(MyEnum.USER_NO_CAR);
+        }
+        i = userMapper.updateCarIdSetZeroById(id);
+        //更新车位信息
+        int y = carMapper.updateCarStateSetZero(carId);
+        if (i+y <= 1) {
+            throw new MyException(MyEnum.USER_DELETE_CAR_FAIL);
+        }
+        return i;
+    }
+
+    /*停用房屋*/
+    @Override
+    public int delRoom(Integer id, Integer roomId) {
+        int i = 0;
+        //获取用户信息，检测是否拥有房屋
+        User user = userMapper.selectByPrimaryKey(id);
+        if (user.getRoomId() == 0) {
+            throw new MyException(MyEnum.USER_NO_ROOM);
+        }
+        i = userMapper.updateRoomIdSetZeroById(id);
+        //更新房屋信息
+        int y = roomMapper.updateRoomSetZeroById(roomId);
+        if (i+y <= 1) {
+            throw new MyException(MyEnum.USER_DELETE_ROOM_FAIL);
+        }
+
+        return i;
+    }
+
+    /*分配车位*/
+    @Override
+    public int createCar(Integer uId, Integer carId) {
+        int i = 0;
+        Car car = carMapper.selectByPrimaryKey(carId);
+        if (car.getCState() == 1) {
+            throw new MyException(MyEnum.CAR_HAVE_MASTER);
+        }
+        i = userMapper.updateCarIdSetOneById(uId, carId);
+        //更新车位信息
+        int y = carMapper.updateCarStateSetOne(carId);
+        if (i+y <= 1) {
+            throw new MyException(MyEnum.USER_CREATE_CAR_FAIL);
+        }
+        return i;
+    }
+
+    /*分配房屋*/
+    @Override
+    public int createRoom(Integer uId, Integer roomId) {
+        int i = 0;
+        Room room = roomMapper.selectRoomById(roomId);
+        if (room.getRState() == 1) {
+            throw new MyException(MyEnum.ROOM_HAVE_MASTER);
+        }
+        i = userMapper.updateRoomIdSetOneById(uId, roomId);
+        //更新房屋信息
+        int y = roomMapper.updateRoomStateSetOne(roomId);
+        if (i+y <= 1) {
+            throw new MyException(MyEnum.USER_CREATE_ROOM_FAIL);
+        }
+        return i;
+    }
+
 }

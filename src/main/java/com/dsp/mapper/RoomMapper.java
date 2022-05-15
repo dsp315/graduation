@@ -16,7 +16,13 @@ public interface RoomMapper extends BaseTkMapper<Room> {
     Room selectRoomById(@Param("id") Integer id);
     //根据名字模糊查询
     List<Room> selectRoomByNameAndLike(Room room);
-    //添加
-    //int insertRoom(@Param("roomName") String roomName,@Param("bId") Integer bId);
 
+    //修改状态为无主
+    int updateRoomSetZeroById(Integer rId);
+
+    //修改状态为有主
+    int updateRoomStateSetOne(Integer roomId);
+
+    //查询无主的房屋
+    List<Room> selectRoomListByStateSetZero();
 }

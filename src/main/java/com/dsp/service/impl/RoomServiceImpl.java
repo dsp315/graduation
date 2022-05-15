@@ -3,6 +3,7 @@ package com.dsp.service.impl;
 import com.dsp.domain.Room;
 import com.dsp.excetion.MyEnum;
 import com.dsp.excetion.MyException;
+import com.dsp.mapper.BuildingMapper;
 import com.dsp.mapper.RoomMapper;
 import com.dsp.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -25,6 +27,9 @@ public class RoomServiceImpl implements RoomService {
     @Resource
     RoomMapper roomMapper;
 
+    @Resource
+    BuildingMapper buildingMapper;
+
     /*查询所有*/
     @Override
     public List<Room> getRoomList() {
@@ -35,6 +40,12 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Room getRoomById(Integer id) {
         return roomMapper.selectRoomById(id);
+    }
+
+    /*查询无主的房屋*/
+    @Override
+    public List<Room> getRoomListByStateSetZero(){
+        return roomMapper.selectRoomListByStateSetZero();
     }
 
     /*模糊查询*/

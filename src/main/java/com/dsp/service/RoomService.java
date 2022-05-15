@@ -10,6 +10,8 @@ public interface RoomService {
 
     List<Room> getRoomAndLike(Room param);
 
+    List<Room> getRoomListByStateSetZero();
+
     int addRoom(Room room);
 
     int delRoomById(String ids);

@@ -82,6 +82,7 @@
         form.on('submit(btn-submit-filter)', function(data){
             //异步提交数据
             var url = ctxPath + "room";
+            console.log(data.field);
             data.field._method = "PUT";
             $.post(url,data.field,function (response) {
                 if (response.code == 0){

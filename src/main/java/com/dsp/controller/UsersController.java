@@ -1,14 +1,17 @@
 package com.dsp.controller;
 
+import com.dsp.domain.Car;
+import com.dsp.domain.Room;
 import com.dsp.domain.User;
 import com.dsp.excetion.MyException;
-import com.dsp.service.UsersService;
+import com.dsp.service.*;
 import com.dsp.vo.ResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -95,7 +98,7 @@ public class UsersController {
     }
     @PutMapping("")
     @ResponseBody
-    public ResultVO updateNotice(User user){
+    public ResultVO updateInfo(User user){
         ResultVO resultVO = new ResultVO();
         try {
             int i = usersService.editUser(user);
@@ -107,5 +110,111 @@ public class UsersController {
             resultVO.setMsg(e.getMessage());
         }
         return resultVO;
+    }
+    /*停用车位*/
+    @PutMapping("/delCar")
+    @ResponseBody
+    public ResultVO delCar(Integer id, Integer carId){
+        ResultVO resultVO = new ResultVO();
+        try {
+            int i = usersService.delCar(id,carId);
+            if (i>0){
+                resultVO.setCode(0);
+                resultVO.setMsg("停用车位成功");
+            }
+        }catch (MyException e){
+            resultVO.setMsg(e.getMessage());
+        }
+
+        return resultVO;
+    }
+    /*停用房屋*/
+    @PutMapping("/delRoom")
+    @ResponseBody
+    public ResultVO delRoom(Integer id, Integer roomId){
+        ResultVO resultVO = new ResultVO();
+        try {
+            int i = usersService.delRoom(id,roomId);
+            if (i>0){
+                resultVO.setCode(0);
+                resultVO.setMsg("停用房屋成功");
+            }
+        }catch (MyException e){
+            resultVO.setMsg(e.getMessage());
+        }
+        return resultVO;
+    }
+    /*分配车位*/
+    @Autowired
+    CarService carService;
+    //跳转页面
+    @GetMapping("/createCarUI/{uid}")
+    public String createCarUI(@PathVariable Integer uid, Model model){
+        User user = usersService.selectUserById(uid);
+        model.addAttribute("user",user);
+        model.addAttribute("cars",carService.getCarList());
+        return "admin/users/createCar";
+    }
+    //分配车位
+    @PutMapping("/createCar")
+    @ResponseBody
+    public ResultVO createCar(User user){
+        ResultVO resultVO = new ResultVO();
+        try {
+            Integer uId = user.getUId();
+            Integer carId = user.getCarId();
+            int i = usersService.createCar(uId,carId);
+            if (i>0){
+                resultVO.setCode(0);
+                resultVO.setMsg("分配车位成功");
+            }
+        }catch (MyException e){
+            resultVO.setMsg(e.getMessage());
+        }
+        return resultVO;
+    }
+
+    /*分配房屋*/
+    @Autowired
+    BuildingService buildingService;
+    @Autowired
+    UnitSerivce unitSerivce;
+    @Autowired
+    RoomService roomService;
+    //跳转到房屋页面
+    @GetMapping("/createRoomUI/{id}")
+    public String createRoomUI(@PathVariable Integer id, Model model){
+        User user = usersService.selectUserById(id);
+        model.addAttribute("rooms",roomService.getRoomListByStateSetZero());
+        model.addAttribute("user",user);
+        return "admin/users/createRoom";
+    }
+    //分配房屋
+    @PutMapping("/createRoom")
+    @ResponseBody
+    public ResultVO createRoom(User user){
+        ResultVO resultVO = new ResultVO();
+        try {
+            Integer uId = user.getUId();
+            Integer roomId = user.getRoomId();
+            int i = usersService.createRoom(uId,roomId);
+            if (i>0){
+                resultVO.setCode(0);
+                resultVO.setMsg("分配房屋成功");
+            }
+        }catch (MyException e){
+            resultVO.setMsg(e.getMessage());
+        }
+        return resultVO;
+    }
+    /*缴费*/
+    @Autowired
+    PayService payService;
+    //跳转到缴费页面
+    @GetMapping("/createUserPayUI/{id}")
+    public String createUserPayUI(@PathVariable Integer id, Model model){
+        model.addAttribute("pays",payService.getPayList());
+        model.addAttribute("userId",id);
+        return "admin/users/createUserPay";
     }
 }

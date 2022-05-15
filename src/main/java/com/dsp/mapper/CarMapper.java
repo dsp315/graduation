@@ -9,4 +9,7 @@ import tk.mybatis.mapper.common.BaseMapper;
 @Component
 @Mapper
 public interface CarMapper extends BaseTkMapper<Car> {
+    int updateCarStateSetZero(Integer cId);
+
+    int updateCarStateSetOne(Integer carId);
 }

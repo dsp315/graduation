@@ -27,14 +27,19 @@
 
     <!--id查询-->
     <select id="selectRoomById" parameterType="int" resultMap="roomMap" >
-        SELECT r.r_id, r.r_name, r.r_area, r.r_state, t.t_name
+        SELECT r.r_id, r.r_name, r.r_area, r.r_state, r.unit_id, t.t_name
         FROM room r, unit t
         where r.unit_id = t.t_id AND r.r_id = #{id}
     </select>
 
+    <!--查询无主房屋-->
+    <select id="selectRoomListByStateSetZero" resultMap="roomMap">
+        select * from room where r_state = 0
+    </select>
+
     <!--模糊查询-->
     <select id="selectRoomByNameAndLike" parameterType="com.dsp.domain.Room" resultMap="roomMap">
-        SELECT r.r_id, r.r_name, r.r_area, r.r_state, t.t_name
+        SELECT r.r_id, r.r_name, r.r_area, r.r_state,r.unit_id, t.t_name
         FROM room r, unit t
         <where>
             <if test="rName != null">
@@ -49,8 +54,13 @@
         </where>
     </select>
 
-    <insert id="insertRoom">
 
-    </insert>
+    <update id="updateRoomSetZeroById">
+        update room set r_state = 0 where r_id = #{cId}
+    </update>
+
+    <update id="updateRoomStateSetOne">
+        update room set r_state = 1 where r_id = #{cId}
+    </update>
 
 </mapper>

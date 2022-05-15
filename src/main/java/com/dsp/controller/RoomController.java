@@ -90,10 +90,11 @@ public class RoomController {
     @ResponseBody
     public Integer selectBuildType(Integer uid){
         Unit unit = unitSerivce.getUnitById(uid);
-        Integer tid = unit.getTId();
+        Integer tid = unit.getBuildingId();
         Building build = buildingService.getBuildById(tid);
         return build.getBType();
     }
+
     /*修改*/
     @PutMapping("")
     @ResponseBody

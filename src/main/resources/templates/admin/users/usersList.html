@@ -67,8 +67,12 @@
 
 <!--表格操作工具栏-->
 <script type="text/html" id="col-users-toolbar">
-    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delCar">停用车位</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delRoom">停用房屋</a>
+    <a class="layui-btn layui-btn-xs" lay-event="room">房屋分配</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="car">车位分配</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="payment">缴费管理</a>
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
 </script>
 
 <script th:inline="javascript">
@@ -131,51 +135,19 @@
                 , cols: [[ //表头
                     {type: 'checkbox'}
                     , {field: 'uid', title: 'id', width: 100, sort: true, align: 'center'}
-                    , {field: 'uname', title: '真实姓名', align: 'center'}
-                    , {field: 'uphone', title: '手机号', align: 'center'}
-                    , {field: 'usex', title: '性别', align: 'center' ,templet:'#table-col-usex'}
+                    , {field: 'uname', title: '真实姓名', align: 'center', width: 100}
+                    , {field: 'uphone', title: '手机号', align: 'center', width: 200}
+                    , {field: 'usex', title: '性别', align: 'center' ,templet:'#table-col-usex', width: 120}
                     , {field: 'car', title: '车位',templet:function (d){
                         if (d.car!= null){return d.car.cname;}else{return '暂无'}
-                        }, align: 'center'}
+                        }, align: 'center', width: 100}
                     , {field: 'room', title: '地址',templet:function (d){
                             if (d.room!= null){return d.room.unit.tname+'单元'+d.room.rname;}else{return '暂无'}
-                       }, align: 'center'}
-                    , {title: '操作', width: 200, toolbar: '#col-users-toolbar'}
+                       }, align: 'center', width: 200}
+                    , {title: '操作', toolbar: '#col-users-toolbar', width: 450}
                 ]]
             });
 
-            //表格操作列的监听
-            table.on('tool(table-users-filter)', function (obj) {
-                var data = obj.data; //获得当前行数据
-                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
-
-                if (layEvent === 'del') { //删除
-                    layer.confirm('您确认删除' + data.uname + ' ?', {icon: 3, title: '删除确认'}, function (index) {
-                        //异步发送请求
-                        var url = ctxPath + "users/" + data.uid;
-                        var param = {_method: "DELETE"}
-                        console.log(url)
-                        $.post(url, param, function (response) {
-                            if (response.code == 0) {
-                                //成功，提示和刷新表格
-                                layer.msg("你已删除" + data.uname, {icon: 6, title: "操作结果"});
-                                refreshTable();
-                            } else {
-                                layer.alert(response.msg, {icon: 2, anim: 6})
-                            }
-                        })
-                        layer.close(index);
-                    });
-                } else if (layEvent === 'edit') { //编辑
-                    layer.open({
-                        type: 2,
-                        title: '修改用户',
-                        shadeClose: false,
-                        area: ['50%', '95%'],
-                        content: ctxPath + 'users/' + data.uid
-                    });
-                }
-            });
             //表格头部工具栏的监听
             table.on('toolbar(table-users-filter)', function (obj) {
                 if (obj.event == 'add') {
@@ -200,7 +172,7 @@
                             idArr.push(this.uid);
                         });
 
-                        layer.confirm('您确认删除选中记录？', {icon: 3, title: '删除确认'}, function (index) {
+                        layer.confirm('您确认删除选中记录？', {icon: 6, title: '删除确认'}, function (index) {
                             //异步发送请求
                             var url = ctxPath + "users/" + idArr.join(",");
                             var param = {_method: "DELETE"}
@@ -220,6 +192,137 @@
                 }
 
             });
+
+            //表格操作列的监听
+            table.on('tool(table-users-filter)', function (obj) {
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+
+                if (layEvent === 'edit') { // 修改
+                    showEditModel(data);
+                } else if (layEvent === 'room') { // 分配房间
+                    showRoomModel(data);
+                } else if (layEvent === 'car') { // 分配车位
+                    showCarModel(data);
+                } else if (layEvent === 'delCar') { // 停用车位
+                    doDelCar(data);
+                } else if (layEvent === 'delRoom') { // 停用房屋
+                    doDelRoom(data);
+                } else if (layEvent === 'payment') { // 使用缴费
+                    showPaymentModel(data);
+                }
+                //缴费
+                function showPaymentModel(data){
+                    layer.open({
+                        type: 2,
+                        title: '缴费',
+                        shadeClose: false,
+                        area: ['50%', '95%'],
+                        content: ctxPath + 'users/createUserPayUI/' + data.uid
+                    });
+                }
+                //修改
+                function showEditModel(data){
+                    layer.open({
+                        type: 2,
+                        title: '修改用户',
+                        shadeClose: false,
+                        area: ['50%', '95%'],
+                        content: ctxPath + 'users/' + data.uid
+                    });
+                }
+                //停用车位
+                function doDelCar(data){
+                    layer.confirm('确定要停用车位吗？', {
+                        skin: 'layui-layer-admin',
+                        shade: .1
+                    }, function (index) {
+                        layer.close(index);
+                        //异步提交数据
+                        var url = ctxPath + "users/delCar";
+                        $.post(url, {_method:"PUT",id:data.uid,carId:data.car.cid}, function (response) {
+                            if (response.code == 0) {
+                                //成功则关闭页面，并刷新数据
+                                layer.msg(response.msg, {
+                                    icon: 1,
+                                    time: 1500 //2秒关闭（如果不配置，默认是3秒）
+                                }, function () {
+                                    //刷新数据
+                                    refreshTable();
+                                });
+                            } else {
+                                //失败，不关闭页面，提示错误信息
+                                layer.msg(response.msg, {
+                                    icon: 2,
+                                    anim: 6
+                                });
+                            }
+                        })
+
+                    });
+                }
+                //停用房屋
+                function doDelRoom(data){
+                    layer.confirm('确定要停用房屋吗？', {
+                        skin: 'layui-layer-admin',
+                        shade: .1
+                    }, function (index) {
+                        layer.close(index);
+                        //异步提交数据
+                        var url = ctxPath + "users/delRoom";
+                        $.post(url, {_method:"PUT",id:data.uid,roomId:data.room.rid}, function (response) {
+                            if (response.code == 0) {
+                                //成功则关闭页面，并刷新数据
+                                layer.msg(response.msg, {
+                                    icon: 1,
+                                    time: 1500 //2秒关闭（如果不配置，默认是3秒）
+                                }, function () {
+                                    //刷新数据
+                                    refreshTable();
+                                });
+                            } else {
+                                //失败，不关闭页面，提示错误信息
+                                layer.msg(response.msg, {
+                                    icon: 2,
+                                    anim: 6
+                                });
+                            }
+                        })
+
+                    });
+                }
+                //分配车位
+                function showCarModel(data){
+                    if (data.car != null){
+                        layer.msg('已有车位，请禁用车位后，再进行操作', {icon: 5});
+                    }else {
+                        layer.open({
+                            type: 2,
+                            title: '分配车位',
+                            shadeClose: false,
+                            area: ['50%', '90%'],
+                            content: ctxPath + 'users/createCarUI/' + data.uid
+                        });
+                    }
+                }
+                //分配房屋
+                function showRoomModel(data){
+                    if (data.room != null){
+                        layer.msg('已有房屋，请禁用房屋后，再进行操作', {icon: 5});
+                    }else {
+                        layer.open({
+                            type: 2,
+                            title: '分配房屋',
+                            shadeClose: false,
+                            area: ['50%', '95%'],
+                            content: ctxPath + 'users/createRoomUI/' + data.uid
+                        });
+                    }
+                }
+
+
+            });
+
 
         })
 </script>

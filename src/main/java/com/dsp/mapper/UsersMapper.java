@@ -11,5 +11,11 @@ import java.util.List;
 @Component
 public interface UsersMapper extends BaseTkMapper<User> {
 
-    List<User> selectList();
+    /*停用*/
+    int updateCarIdSetZeroById(Integer id);
+    int updateRoomIdSetZeroById(Integer id);
+
+    /*分配*/
+    int updateCarIdSetOneById(Integer uId, Integer cId);
+    int updateRoomIdSetOneById(Integer uId, Integer rId);
 }
