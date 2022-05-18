@@ -14,6 +14,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -58,6 +59,21 @@ public class GuestbookServiceImpl implements GuestbookService {
         return guestbooks;
     }
 
+    /*分页查询*/
+    @Override
+    public List<Guestbook> getGuestbookList(long current, long pageTotal) {
+        long page = (current -1 )* pageTotal;
+        List<Guestbook> guestbooks = guestbookMapper.selectGuestbookListPage(page,pageTotal);
+        //遍历循环获取各自的user放到属性User
+        for (Guestbook guestbook : guestbooks) {
+            //根据userid获取user
+            User user = userMapper.selectByPrimaryKey(guestbook.getUserId());
+            //将获取到的user放到maintain的属性类中
+            guestbook.setUser(user);
+        }
+        return guestbooks;
+    }
+
     @Override
     public Guestbook getGuestbookById(Integer id) {
         Guestbook guestbook = guestbookMapper.selectById(id);
@@ -86,6 +102,26 @@ public class GuestbookServiceImpl implements GuestbookService {
         } catch (MyException e) {
             txManager.rollback(status);
             throw new MyException(MyEnum.Guestbook_DELETE_FAIL);
+        }
+    }
+
+    @Override
+    public int addGuestbook(Guestbook guestbook) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = txManager.getTransaction(def);
+        int count = 0;
+
+        try {
+            guestbook.setgReleaseTime(new Date());
+            count = guestbookMapper.insertSelective(guestbook);
+            if (count > 0) {
+                txManager.commit(status);
+            }
+            return count;
+        }catch (MyException e) {
+            txManager.rollback(status);
+            throw new MyException(MyEnum.Guestbook_INSERT_FAIL);
         }
     }
 }

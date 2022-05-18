@@ -18,4 +18,6 @@ public interface UsersMapper extends BaseTkMapper<User> {
     /*分配*/
     int updateCarIdSetOneById(Integer uId, Integer cId);
     int updateRoomIdSetOneById(Integer uId, Integer rId);
+
+    int updateByIdInfo(User user);
 }

@@ -12,4 +12,8 @@ public interface MaintainService {
     int delMaintainById(String ids);
 
     Maintain getMaintainById(Integer id);
+
+    int addMaintain(Maintain maintain);
+
+    List<Maintain> getMaintainListByUserId(Integer id);
 }

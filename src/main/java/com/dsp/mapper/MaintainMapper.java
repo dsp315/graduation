@@ -16,4 +16,6 @@ public interface MaintainMapper extends BaseTkMapper<Maintain> {
     List<Maintain> selectMaintainAndLike(Maintain param);
 
     Maintain selectById(Integer id);
+
+    List<Maintain> selectMaintainListByUserId(Integer userId);
 }

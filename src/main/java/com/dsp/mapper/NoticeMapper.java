@@ -16,4 +16,9 @@ public interface NoticeMapper extends BaseTkMapper<Notice> {
     List<Notice> selectNoticeAndLike(Notice notice);
 
     Notice selectNoticeById(Integer id);
+
+    //查询已发布的公告
+    List<Notice> selectNoticeStateSetOne();
+
+    List<Notice> selectNoticeStateSetOnePage(long page, long pages);
 }

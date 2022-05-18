@@ -32,7 +32,7 @@
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username" for="username"></label>
-                    <input type="text" name="username" lay-verify="required|account" placeholder="用户名或者邮箱" autocomplete="off" class="layui-input" value="admin">
+                    <input type="text" name="username" lay-verify="required|account" placeholder="用户名或手机号" autocomplete="off" class="layui-input" value="user">
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-password" for="password"></label>
@@ -99,24 +99,48 @@
                 }
                 //判断登录是否为管理员身份
                 var str = data.username.substr(0,5)
-                //异步校验(管理员)
-                var url = ctxPath + "admin/login";
-                $.post(url,{
-                    'aName': data.username,
-                    'aPassword': data.password,
-                    'captcha':data.captcha
-                },function (response) {
-                    if (response.code == 0){
-                        layer.msg('管理员登录成功',{icon: 6, time: 2000}, function () {
-                            window.location = '/admin/index';
-                        });
-                    }else {
-                        layer.msg(response.msg,{icon: 5,time: 1000, anim: 6},function () {
-                            //刷新页面
-                            //location.reload();
-                        })
-                    }
-                })
+                if (str == "admin"){
+                    //异步校验(管理员)
+                    var url = ctxPath + "admin/login";
+                    $.post(url,{
+                        'aName': data.username,
+                        'aPassword': data.password,
+                        'captcha':data.captcha
+                    },function (response) {
+                        if (response.code == 0){
+                            layer.msg('管理员登录成功',{icon: 6, time: 2000}, function () {
+                                window.location = '/admin/index';
+                            });
+                        }else {
+                            layer.msg(response.msg,{icon: 5,time: 1000, anim: 6},function () {
+                                //刷新页面
+                                location.reload();
+                            })
+                        }
+                    })
+                }else {
+                    //异步校验(用户)
+                    var url = ctxPath + "user/login";
+                    $.post(url,{
+                        'uName': data.username,
+                        'uPassword': data.password,
+                        'captcha':data.captcha
+                    },function (response) {
+                        if (response.code == 0){
+                            layer.msg(data.username + '，欢迎回来',{icon: 6, time: 2000}, function () {
+                                window.location = '/user/index';
+                            });
+                        }else {
+                            layer.msg(response.msg,{icon: 5,time: 1000, anim: 6},function () {
+                                //刷新页面
+                                location.reload();
+                            })
+                        }
+                    })
+                }
+
+
+
                 return false;
 
             });

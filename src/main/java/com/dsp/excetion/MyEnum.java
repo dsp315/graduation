@@ -40,20 +40,22 @@ public enum MyEnum {
     NOTICE_UPDATE_FAIL("006-004","服务器繁忙，公告修改失败，请稍后重试"),
 
     MAINTAIN_NOT_EXIST("007-001","维修不存在"),
+    MAINTAIN_INSERT_FAIL("007-002","服务器繁忙，维修发送失败，请稍后重试"),
     MAINTAIN_DELETE_FAIL("007-003","服务器繁忙，维修删除失败，请稍后重试"),
     MAINTAIN_UPDATE_FAIL("007-004","服务器繁忙，维修受理失败，请稍后重试"),
 
     Guestbook_NOT_EXIST("008-001","留言不存在"),
-    Guestbook_DELETE_FAIL("008-002","服务器繁忙，留言删除失败，请稍后重试"),
-    Guestbook_UPDATE_FAIL("008-003","服务器繁忙，留言处理失败，请稍后重试"),
+    Guestbook_INSERT_FAIL("008-002","服务器繁忙，留言发送失败，请稍后重试"),
+    Guestbook_DELETE_FAIL("008-003","服务器繁忙，留言删除失败，请稍后重试"),
+    Guestbook_UPDATE_FAIL("008-004","服务器繁忙，留言处理失败，请稍后重试"),
 
     USER_PAY_UPDATE_FAIL("009-001", "服务器繁忙，缴费失败失败，请稍后重试"),
     USER_PAY_INSERT_FAIL("009-002", "服务器繁忙，缴费通知失败，请稍后重试"),
 
     USER_NOT_EXIST("010-001","用户不存在，请输入正确的用户名字"),
     USER_ADD_FAIL("010-002","服务器繁忙，用户添加失败，请稍后重试"),
-    USER_DELETE_FAIL("006-003","服务器繁忙，用户删除失败，请稍后重试"),
-    USER_UPDATE_FAIL("006-004","服务器繁忙，用户修改失败，请稍后重试"),
+    USER_DELETE_FAIL("010-003","服务器繁忙，用户删除失败，请稍后重试"),
+    USER_UPDATE_FAIL("010-004","服务器繁忙，用户修改失败，请稍后重试"),
 
     USER_DELETE_CAR_FAIL("006-010","服务器繁忙，停用车位失败，请稍后重试"),
     USER_DELETE_ROOM_FAIL("006-011","服务器繁忙，停用房屋失败，请稍后重试"),
@@ -63,8 +65,13 @@ public enum MyEnum {
     USER_NO_CAR("006-021","该用户没有车位！"),
     USER_NO_ROOM("006-022","该用户没有房屋！"),
 
-    ;
+    user_login_code_fail("100-001","验证码错误"),
+    user_login_not_account("100-002","登录失败"),
+    user_modify_info_fail("100-003","服务器出错了，修改信息失败，请联系管理员"),
+    user_modify_img_fail("100-004","服务器出错了，修改头像失败，请联系管理员"),
+    user_modify_password_fail("100-004","服务器出错了，修改密码失败，请联系管理员"),
 
+    ;
     private String code;
     private String message;
 

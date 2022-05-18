@@ -13,7 +13,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import tk.mybatis.mapper.entity.Example;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -63,6 +65,13 @@ public class MaintainServiceImpl implements MaintainService {
         maintain.setUser(user);
         return maintain;
     }
+    /*根据用户id查询maintain*/
+
+    @Override
+    public List<Maintain> getMaintainListByUserId(Integer id) {
+        return maintainMapper.selectMaintainListByUserId(id);
+
+    }
 
     @Override
     public int delMaintainById(String strIds) {
@@ -87,5 +96,23 @@ public class MaintainServiceImpl implements MaintainService {
         return count;
     }
 
+    @Override
+    public int addMaintain(Maintain maintain) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = txManager.getTransaction(def);
+        int count = 0;
 
+        try {
+            maintain.setMReleaseTime(new Date());
+            count = maintainMapper.insertSelective(maintain);
+            if (count>0){
+                txManager.commit(status);
+            }
+        }catch (MyException e) {
+            txManager.rollback(status);
+            throw new MyException(MyEnum.MAINTAIN_INSERT_FAIL);
+        }
+        return count;
+    }
 }

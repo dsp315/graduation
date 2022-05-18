@@ -19,7 +19,6 @@ public class User {
     private Integer uSex;
     private Long uPhone;
     private String username;
-    private Float uPay;
     private String uImg;
 
     private Integer roomId;

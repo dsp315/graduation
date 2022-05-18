@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>首页</title>
+		<link rel="icon" th:href="@{/images/favicon.ico}">
+		<link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+		<link rel="stylesheet" th:href="@{/css/index.css}">
+
+	</head>
+	<body>
+		<!-- 头部 -->
+		<script th:src="@{/js/common/nav.js}" type="text/javascript" charset="utf-8"></script>
+		
+		<!-- 中间 -->
+		<div class="layui-bodyer">
+			<!-- 主体 -->
+			<div class="m-padded-tb-large">
+				<div class="layui-container">
+					<div class="layui-row">
+						<!-- 右边 -->
+						<div class="layui-col-md7 layui-col-md-offset1">
+			
+							<fieldset class="layui-elem-field" style="width: 600px;" >
+								<legend class="m-text-h2">公告</legend>
+								<div class="m-padded-tb-smaller ">
+									<!-- 公告1 -->
+									<fieldset th:each="notice:${notices}" class="layui-elem-field">
+										<div class="layui-field-box">
+											<div class="layui-row">
+												<div class="layui-col-md7">
+													<a class="m-text-h3" th:href="@{/user/toNoticeDetailUI}+'/'+${notice.NId}" target="_blank" th:text="${notice.NTitle}">标题1</a><br>
+												</div>
+												<div class="layui-col-md2 layui-col-md-offset3">
+													<button type="button" class="layui-btn layui-btn-xs"
+														style="color: white">发布时间</button>
+													<p th:text="${#dates.format(notice.NReleaseTime,'yyyy-MM-dd')}" style="padding-top: 10px;">2022-04-02</p>
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</fieldset>
+							<div>
+								<!--分页左侧-->
+								<span class="">
+									<span>当前第</span> <strong th:text="${page.current}"></strong> <span>页</span>
+									<span>总计</span> <strong th:text="${page.pages}"></strong> <span>页</span>
+									<span>共</span> <strong th:text="${page.total}"></strong><span>条记录</span>
+								</span>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<!--分页右侧-->
+								<span>
+									<span th:if="${page.current>1}" class="prev"><a th:href="@{/user/notice(pn=${(page.current)-1})}"><button type="button" class="layui-btn layui-btn-normal layui-btn-sm"><i class="layui-icon"></i></button></a></span>
+										<span th:if="${page.current==1}" class="layui-hide"><a><button type="button" class="layui-btn layui-btn-normal layui-btn-sm"><i class="layui-icon"></i></button></a></span>
+										<span th:class="${num == page.current?'active':''}" class="active" th:each="num:${#numbers.sequence(1,page.pages)}">
+											<a th:href="@{/user/notice(pn=${num})}">[[${num}]]</a>
+										</span>
+										<span th:if="${page.current<page.pages}" class="next"><a th:href="@{/user/notice(pn=${(page.current)+1})}"><button type="button" class="layui-btn layui-btn-normal layui-btn-sm"><i class="layui-icon"></i></button></a></span>
+										<span th:if="${page.current==page.pages}" class="layui-hide"><a><button type="button" class="layui-btn layui-btn-xs layui-btn-normal"><button type="button" class="layui-btn layui-btn-normal layui-btn-sm"><i class="layui-icon"></i></button></button></a></span>
+								</span>
+							</div>
+						</div>
+						<!-- 左边 -->
+						<div class="layui-col-md3 layui-col-md-offset1 div-fixed" >
+							
+							<fieldset class="layui-elem-field">
+								<legend class="m-text-h2">留言</legend>
+								<div class="layui-field-box">
+									<!-- 留言1 -->
+									<fieldset th:each="guestbook:${guestbooks}" class="layui-elem-field">
+										<div class="layui-field-box">
+											<a class="m-text-h3" th:href="@{/user/toGuestbookDetailUI}+'/'+${guestbook.gId}" target="_blank" th:text="${guestbook.gTitle}"></a>
+										</div>
+									</fieldset>
+									<div><a  th:href="@{/user/guestbook}">更多</a></div>
+									<span>
+										<button type="button" class="layui-btn layui-btn-warm layui-btn-radius layui-btn-xs">我也要留言</button>
+									</span>
+
+								</div>
+							</fieldset>
+			
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 底部 -->
+		<div class="layui-footer">
+			<script th:src="@{/js/common/footer.js}" type="text/javascript" charset="utf-8"></script>
+		</div>
+
+		<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+		<script th:src="@{/js/jquery.min.js}" charset="utf-8"></script>
+
+		<script th:inline="javascript">
+		var ctxPath = [[@{/}]];
+			//注意：导航 依赖 element 模块，否则无法进行功能性操作
+			layui.use('laypage', function() {
+
+
+
+			});
+		</script>
+
+	</body>
+</html>

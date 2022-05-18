@@ -48,6 +48,53 @@ public class NoticeServiceImpl implements NoticeService {
         }
         return list;
     }
+    /*查询已发布的公告*/
+    @Override
+    public List<Notice> getNoticeStateSetOne() {
+        List<Notice> list = noticeMapper.selectNoticeStateSetOne();
+        if (list.size() !=0){
+            //遍历list，通过外键获取admin的信息，并赋值给各个属性
+            for (int i = 0; i<list.size();i++){
+                Notice notice = list.get(i);
+                //获取修改者的外键id
+                Integer adminMoId = notice.getAdminMoId();
+                //获取修改者管理员信息，并赋值给AdminMo
+                Admin adminMo = adminMapper.selectByPrimaryKey(adminMoId);
+                notice.setAdminMo(adminMo);
+                //将发布者信息获取，并赋值给AdminPu
+                Integer adminPuId = notice.getAdminPuId();
+                Admin adminPu = adminMapper.selectByPrimaryKey(adminPuId);
+                notice.setAdminPu(adminPu);
+                //将发布日期格式化
+            }
+        }
+        return list;
+    }
+    /*分页查询已发布的公告*/
+    @Override
+    public List<Notice> getNoticeStateSetOne(long current,int pageTotal) {
+
+        long page = (current -1 ) * 5;
+        List<Notice> list = noticeMapper.selectNoticeStateSetOnePage(page,pageTotal);
+        if (list.size() !=0){
+            //遍历list，通过外键获取admin的信息，并赋值给各个属性
+            for (int i = 0; i<list.size();i++){
+                Notice notice = list.get(i);
+                //获取修改者的外键id
+                Integer adminMoId = notice.getAdminMoId();
+                //获取修改者管理员信息，并赋值给AdminMo
+                Admin adminMo = adminMapper.selectByPrimaryKey(adminMoId);
+                notice.setAdminMo(adminMo);
+                //将发布者信息获取，并赋值给AdminPu
+                Integer adminPuId = notice.getAdminPuId();
+                Admin adminPu = adminMapper.selectByPrimaryKey(adminPuId);
+                notice.setAdminPu(adminPu);
+                //将发布日期格式化
+            }
+        }
+        return list;
+    }
+
     @Override
     public Notice getNoticeById(Integer id) {
         Notice notice = noticeMapper.selectNoticeById(id);
@@ -148,4 +195,5 @@ public class NoticeServiceImpl implements NoticeService {
         }
         return i;
     }
+
 }

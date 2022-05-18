@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 
@@ -54,6 +55,24 @@ public class MaintainController {
 
         return resultVO;
     }
+    /*根据用户id查信息*/
+    @GetMapping("/listByUserId")
+    @ResponseBody
+    public ResultVO toMaintainListByUserId(HttpSession session){
+        ResultVO resultVO = new ResultVO();
+            /*查询所有*/
+            try {
+                User user = (User) session.getAttribute("info");
+                Integer id = user.getUId();
+                List<Maintain> list = maintainService.getMaintainListByUserId(id);
+                resultVO.setData(list);
+                resultVO.setCode(0);
+                resultVO.setCount((long) list.size());
+            } catch (MyException e) {
+                resultVO.setMsg(e.getMessage());
+            }
+        return resultVO;
+    }
 
     /*删除*/
     @DeleteMapping("/{ids}")
@@ -84,5 +103,22 @@ public class MaintainController {
         User user = userService.selectUserById(maintain.getUserId());
         model.addAttribute("user",user);
         return "admin/maintain/maintainEdit";
+    }
+    /*用户发送维修（增）*/
+    @PostMapping("")
+    @ResponseBody
+    public ResultVO addMaintain(Maintain maintain, HttpSession session){
+        ResultVO resultVO = new ResultVO();
+        try {
+            User user = (User) session.getAttribute("info");
+            maintain.setUserId(user.getUId());
+            int i = maintainService.addMaintain(maintain);
+            resultVO.setCode(0);
+            resultVO.setMsg("发送维修通知成功");
+        }catch (MyException e){
+            resultVO.setMsg(e.getMessage());
+        }
+
+        return resultVO;
     }
 }

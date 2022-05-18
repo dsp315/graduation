@@ -62,4 +62,14 @@
         </where>
     </select>
 
+    <select id="selectNoticeStateSetOne" resultMap="notice">
+        select *
+        from notice where n_state  = 1
+    </select>
+    <select id="selectNoticeStateSetOnePage" resultMap="notice">
+        select *
+        from notice where n_state  = 1
+        limit #{page},#{pages}
+    </select>
+
 </mapper>

@@ -49,7 +49,7 @@ public class AdminController {
     }
 
     @GetMapping("/index")
-    public String toIndex(Admin admin){
+    public String toIndex(){
         return "admin/index";
     }
 
@@ -142,7 +142,7 @@ public class AdminController {
     /*修改密码*/
     @PostMapping("/editPassword")
     @ResponseBody
-    public ResultVO editPassword(Admin admin,HttpSession session,HttpServletRequest request){
+    public ResultVO editPassword(Admin admin,HttpSession session){
         ResultVO resultVO = new ResultVO();
         try {
             Admin admin1 = (Admin) session.getAttribute("info");

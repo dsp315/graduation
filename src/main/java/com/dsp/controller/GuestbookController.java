@@ -1,6 +1,8 @@
 package com.dsp.controller;
 
+import com.dsp.domain.Car;
 import com.dsp.domain.Guestbook;
+import com.dsp.domain.User;
 import com.dsp.excetion.MyException;
 import com.dsp.service.GuestbookService;
 import com.dsp.vo.ResultVO;
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -64,6 +68,23 @@ public class GuestbookController {
             resultVO.setMsg(e.getMessage());
         }
         return resultVO;
+    }
+    /*增加*/
+    /*添加*/
+    @PostMapping("")
+    @ResponseBody
+    public ResultVO<Object> addGuestbook(HttpSession session, Guestbook guestbook){
+        ResultVO resultVO = new ResultVO();
+        try {
+            User user = (User) session.getAttribute("info");
+            guestbook.setUserId(user.getUId());
+            int i = guestbookService.addGuestbook(guestbook);
+            resultVO.setCode(0);
+            resultVO.setMsg("发布维修成功");
+        }catch (MyException e){
+            resultVO.setMsg(e.getMessage());
+        }
+        return  resultVO;
     }
 
 }

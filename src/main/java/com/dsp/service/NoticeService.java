@@ -16,4 +16,8 @@ public interface NoticeService {
     Notice getNoticeById(Integer id);
 
     int updateNotice(Notice notice);
+
+    List<Notice> getNoticeStateSetOne();
+
+    List<Notice> getNoticeStateSetOne(long current,int pageTotal);
 }

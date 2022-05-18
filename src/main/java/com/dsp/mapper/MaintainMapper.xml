@@ -52,4 +52,13 @@
         </where>
     </select>
 
+    <select id="selectMaintainListByUserId" resultMap="maintainMap">
+        select * from maintain
+        <where>
+            <if test="userId != null">
+                user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
 </mapper>

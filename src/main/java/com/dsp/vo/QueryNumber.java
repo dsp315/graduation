@@ -1,16 +1,9 @@
 package com.dsp.vo;
 
-import lombok.Data;
-
 
 public class QueryNumber {
     public Long startNum;
     public Long endNum;
-
-    public QueryNumber(Long startNum, Long endNum) {
-        this.startNum = startNum;
-        this.endNum = endNum;
-    }
 
     public QueryNumber() {
     }

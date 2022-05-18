@@ -1,10 +1,342 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>个人中心</title>
+    <link rel="icon" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
+<style>
+    /*输入框透明化*/
+    .layui-input-inline > input {
+        background-color: transparent;
+        border: 0;
+    }
+</style>
 <body>
-user
+<!-- 头部 -->
+<script th:src="@{/js/common/nav.js}" type="text/javascript" charset="utf-8"></script>
+
+<!-- 主体 -->
+<div class="layui-border">
+    <!-- 个人信息 -->
+    <div class="layui-container m-padded-tb-large">
+        <!-- 表格 -->
+        <fieldset class="layui-elem-field" th:object="${user}">
+            <legend>个人中心</legend>
+            <form class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-inline" style="left: 10%">
+                        <label class="layui-form-label">户主编号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="uId" name="uId" th:field="*{UId}" readonly autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="left: 25%">
+                        <label class="layui-form-label">户主姓名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="uName" th:field="*{UName}" name="uName"  readonly autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline" style="left: 10%">
+                        <label class="layui-form-label">户主性别</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="uSex" th:value="*{USex}==0?'女':'男'" autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="left: 25%">
+                        <label class="layui-form-label">联系方式</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="uPhone" name="uPhone" th:field="*{UPhone}" autocomplete="off"
+                                   class="layui-input" lay-verify="phone">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline" style="left: 10%">
+                        <label class="layui-form-label">房屋信息</label>
+                        <div class="layui-input-inline">
+                            <input type="text" th:value="${room}==null?'暂无房屋，快去申请':${room.RName}" readonly
+                                   autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="left: 25%">
+                        <label class="layui-form-label">车位</label>
+                        <div class="layui-input-inline">
+                            <input type="text" th:value="${car}==null?'暂无房屋，快去申请':${car.CName}" readonly autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline" style="left: 10%">
+                        <label class="layui-form-label">用户名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="username" name="username" th:field="*{username}" lay-verify="username" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">该名字用于留言显示信息</div>
+                    </div>
+                    <div class="layui-inline" style="left: 20%">
+                        <button id="editInfo" lay-submit lay-filter="editInfo" class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">修改信息</button>
+                    </div>
+                    <div class="layui-inline" style="left: 30%">
+                        <button type="button" id="editPassword" class="layui-btn layui-btn-sm layui-btn-radius layui-btn-danger">修改密码
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </fieldset>
+
+        <!--维修表-->
+        <fieldset class="layui-elem-field">
+            <legend>维修表</legend>
+            <div style="background-color: transparent;border: 0;">
+                <table id="table-maintain" lay-data="{id: 'maintainTableId'}"
+                       lay-filter="table-maintain-filter"></table>
+            </div>
+        </fieldset>
+
+        <div class="layui-container m-padded-tb-large">
+            <div class="layui-row">
+                <div class="layui-col-md4 ">
+                    <fieldset class="layui-elem-field" style="width: 300px;">
+                        <legend>留言板</legend>
+                        <div class="layui-field-box" align="center">
+
+                            <input type="text" id="guestbookTitle" placeholder="请输入留言标题" autocomplete="off"
+                                   style="background-color: transparent;border: 0;" class="layui-input">
+                            <hr class="layui-border-orange">
+                            <textarea id="guestContent" required lay-verify="required" placeholder="请输入留言内容"
+                                      class="layui-textarea"
+                                      style="background-color: transparent;border: 0;"></textarea>
+                            <button id="btn-guestbook" class="layui-btn layui-btn-sm layui-btn-warm" type="button">
+                                我要留言
+                            </button>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="layui-col-md4 ">
+                    <fieldset class="layui-elem-field" style="width: 300px;">
+                        <legend>我要维修</legend>
+                        <div class="layui-field-box">
+                            <div class="layui-field-box" align="center">
+									<textarea id="maintainContent" required lay-verify="required" placeholder="请输入维修内容"
+                                              class="layui-textarea"
+                                              style="background-color: transparent;border: 0;"></textarea>
+                                <button id="btn-maintain" class="layui-btn layui-btn-sm layui-btn-danger" type="button">
+                                    我要维修
+                                </button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="layui-col-md4">
+                    <fieldset class="layui-elem-field" style="width: 300px;">
+                        <legend>支付请扫描</legend>
+                        <div class="layui-field-box" align="center">
+                            <img th:src="@{/images/payimg.png}" width="150px" height="150px">
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- 底部 -->
+        <script th:src="@{/js/common/footer.js}" type="text/javascript" charset="utf-8"></script>
+
+    <script th:src="@{/js/jquery.min.js}" charset="utf-8"></script>
+    <script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+
+    <!--维修表-->
+    <!--有主工具栏-->
+    <script type="text/html" id="table-col-state">
+        <!-- 这里的 checked 的状态只是演示 -->
+        <input type="checkbox" disabled name="mstate" value="{{d.mstate}}" lay-skin="switch" lay-text="已受理|未受理"
+               lay-filter="state-filter" {{ d.mstate== 1 ? 'checked' : '' }}>
+    </script>
+    <!--操作列-->
+    <script type="text/html" id="col-maintain-toolbar">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+    <script th:inline="javascript">
+        var ctxPath = [[@{/}]];
+            //注意：导航 依赖 element 模块，否则无法进行功能性操作
+            layui.use(['element', 'table', 'layer','form'], function () {
+                var table = layui.table;
+                var $ = layui.$;
+                var form = layui.form;
+
+                /*修改密码*/
+                $('#editPassword').click(function (){
+                    layer.open({
+                        type: 2,
+                        title: '修改密码',
+                        shadeClose: false,
+                        area: ['40%', '50%'],
+                        content: ctxPath + 'user/editPasswordUI'
+                    });
+                })
+
+                //表格渲染
+                table.render({
+                    elem: '#table-maintain'
+                    , url: ctxPath + 'maintain/listByUserId' //数据接口
+                    , toolbar: '#table-maintain-toolbar'//头部工具栏
+                    , limit: 4
+                    , title: "维修信息表"
+                    , limits: [10, 5, 20, 50, 100]  //每页条数的选择项
+                    , page: true //开启分页
+                    //分页方法一：
+                    , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
+                        var result;
+                        if (this.page.curr) {
+                            //若为第二页 则curr为2 页面显示的数据就是从res.data集合数组里的 （2-1）*limit（10）=10 到 limit（10）*2=20的数据
+                            result = res.data.slice(this.limit * (this.page.curr - 1), this.limit * this.page.curr);
+                        } else {
+                            // 一开始就是第一页 则就是 显示的数据就是从res.data集合数组里的0到limit（10）中
+                            result = res.data.slice(0, this.limit);
+                        }
+                        return {
+                            "code": res.code, //解析接口状态
+                            "msg": res.msg, //解析提示文本
+                            "count": res.count, //解析数据长度
+                            "data": result //解析数据列表
+                        };
+                    }
+                    , cols: [[ //表头
+                        , {field: 'mid', title: 'id', width: 100, align: 'center', hide: true}
+                        , {field: 'mcontent', title: '维修内容', align: 'center'}
+                        , {field: 'mreleaseTime', title: '发布时间', align: 'center'}
+                        , {field: 'mresult', title: '受理结果', align: 'center'}
+                        , {field: 'mstate', title: '受理状态', sort: true, align: 'center', templet: "#table-col-state"}
+                        , {title: '操作', width: 200, align: 'center', toolbar: '#col-maintain-toolbar'}
+                    ]]
+                });
+                //表格操作列的监听
+                table.on('tool(table-maintain-filter)', function (obj) {
+                    var data = obj.data; //获得当前行数据
+                    var layEvent = obj.event;
+                    if (layEvent === 'del') { //删除
+                        layer.confirm('您确认删除该数据吗?', {icon: 3, title: '删除确认'}, function (index) {
+                            //异步发送请求
+                            var url = ctxPath + "maintain/" + data.mid;
+                            var param = {_method: "DELETE"}
+                            console.log(url)
+                            $.post(url, param, function (response) {
+                                if (response.code == 0) {
+                                    //成功，提示和刷新表格
+                                    layer.msg("你已删除该数据", {icon: 6, title: "操作结果"});
+                                    table.reload('table-maintain');
+                                } else {
+                                    layer.alert(response.msg, {icon: 2, anim: 6})
+                                }
+                            })
+                            layer.close(index);
+                        });
+                    }
+                });
+                /*修改信息*/
+                form.on('submit(editInfo)', function(data){
+                    var  url = ctxPath + 'users'
+                    data.field._method = 'PUT'
+                    if ($('#uSex').val() == '男'){
+                        data.field.uSex = 1
+                        $.post(url,data.field,function (response) {
+                            if (response.code == 0) {
+                                //修改成功
+                                layer.msg(response.msg, {icon: 6, title: "操作结果"});
+                                //添加时间在进行跳转
+                                setTimeout(function () {
+                                    location.href='loginOut'
+                                }, 1000)
+                            } else {
+                                //修改失败
+                                layer.msg(response.msg, {icon: 6, title: "操作结果"});
+                            }
+                        })
+
+                    } else if ($('#uSex').val() == '女') {
+                        data.field.uSex = 0
+                        $.post(url,data.field,function (response) {
+                            if (response.code == 0) {
+                                //修改成功
+                                layer.msg(response.msg+'即将跳转登录页面', {icon: 6, title: "操作结果"});
+                                //添加时间在进行跳转
+                                setTimeout(function () {
+                                    location.href='loginOut'
+                                }, 1000)
+                            } else {
+                                //修改失败
+                                layer.msg(response.msg, {icon: 6, title: "操作结果"});
+                            }
+                        })
+                    } else {
+                        layer.msg('输入的性别有误')
+                    }
+                    return false;
+                })
+
+                /*维修*/
+                $('#btn-maintain').click(function () {
+                    var url = ctxPath + 'maintain'
+                    $.post(url,
+                        {
+                            mContent: $('#maintainContent').val(),
+                        },
+                        function (res) {
+                            if (res.code == 0) {
+                                layer.msg(res.msg)
+                                mContent:$('#maintainContent').val('')
+                            } else {
+                                //失败
+                                layer.confirm('服务器繁忙，是否重新发送？', {
+                                    btn: ['发送', '算了'] //按钮
+                                }, function () {
+                                    $('#btn-maintain').click();
+                                });
+                            }
+                        })
+                });
+
+
+                /*留言*/
+                $('#btn-guestbook').click(function () {
+                    var url = ctxPath + "guestbook";
+                    $.post(url,
+                        {
+                            gTitle: $('#guestbookTitle').val(),
+                            gContent: $('#guestContent').val(),
+                        },
+                        function (res) {
+                            if (res.code == 0) {
+                                layer.msg(res.msg)
+                                $('#guestbookTitle').val('')
+                                $('#guestContent').val('')
+                            } else {
+                                //失败
+                                layer.confirm('服务器繁忙，是否重新留言？', {
+                                    btn: ['发送', '算了'] //按钮
+                                }, function () {
+                                    $('#btn-guestbook').click();
+                                });
+                            }
+                        })
+
+                });
+
+            });
+
+    </script>
 </body>
 </html>

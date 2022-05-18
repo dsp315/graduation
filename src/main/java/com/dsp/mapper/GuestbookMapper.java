@@ -18,4 +18,8 @@ public interface GuestbookMapper extends BaseTkMapper<Guestbook> {
     Guestbook selectById(Integer id);
 
     int deleteById(Integer id);
+
+    List<Guestbook> selectGuestbookListPage(long page, long pages);
+
+    int insertGuestbook(Guestbook guestbook);
 }

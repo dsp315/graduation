@@ -8,8 +8,11 @@ public interface GuestbookService {
     List<Guestbook> getGuestbookAndLike(Guestbook param);
 
     List<Guestbook> getGuestbookList();
+    List<Guestbook> getGuestbookList(long current,long pages);
 
     Guestbook getGuestbookById(Integer id);
 
     int delGuestbookById(String strIds);
+
+    int addGuestbook(Guestbook guestbook);
 }
