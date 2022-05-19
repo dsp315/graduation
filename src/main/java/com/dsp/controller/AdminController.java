@@ -1,9 +1,11 @@
 package com.dsp.controller;
 
 import com.dsp.domain.Admin;
+import com.dsp.excetion.MyEnum;
 import com.dsp.excetion.MyException;
 import com.dsp.service.AdminService;
 import com.dsp.vo.ResultVO;
+import com.wf.captcha.utils.CaptchaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,14 +26,14 @@ public class AdminController {
     @PostMapping("/login")
     @ResponseBody
     public ResultVO login(Admin param, HttpSession session
-             /* ,@RequestParam("captcha")String captcha,HttpServletRequest request */ ){
+             ,@RequestParam("captcha")String captcha,HttpServletRequest request ){
 
         ResultVO resultVO = new ResultVO();
         //验证码登录
-        /* if (!CaptchaUtil.ver(captcha, request)) {
+        if (!CaptchaUtil.ver(captcha, request)) {
             resultVO.setMsg(MyEnum.ADMIN_LOGIN_CODE_FAIL.getMessage());
             return resultVO;
-        } */
+        }
         try {
             Admin admin = adminService.login(param);
             resultVO.setCode(0);
